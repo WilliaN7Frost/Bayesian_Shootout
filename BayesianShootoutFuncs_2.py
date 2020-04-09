@@ -180,10 +180,11 @@ def plotShots2D( your_loc , enemy_loc , buildingDims , bSeper, shots , shotWasHi
     # Plotting the top view of the map
     plt.subplot(1,2,1)
     plt.title("Top Drone View ("+r"$\theta\,$"+" axis)"); plt.xlabel(r"$\alpha\,$"+' axis (cm)'); plt.ylabel(r"$\beta\,$"+' axis (cm)')
-    yourBuildingXY = plt.Rectangle((0,0) , buildingDims[0] , buildingDims[1] , fc='grey',ec="black",zorder=1.)
-    enemyBuildingXY = plt.Rectangle((0,buildingDims[1]*sepCoeff+bSeper) , buildingDims[0] , buildingDims[1] , fc='grey',ec="black",zorder=1.)
+    yourBuildingXY = plt.Rectangle((0,0) , buildingDims[0] , buildingDims[1] , fc='silver',ec="black",zorder=1.)
+    enemyBuildingXY = plt.Rectangle((0,buildingDims[1]*sepCoeff+bSeper) , buildingDims[0] , buildingDims[1] , fc='silver',ec="black",zorder=1.)
     plt.gca().add_patch(yourBuildingXY)
     plt.gca().add_patch(enemyBuildingXY)
+    plt.gca().set_facecolor('dimgray')
     
     if plotPlayers:
         if (plotHitBoxes):
@@ -229,10 +230,11 @@ def plotShots2D( your_loc , enemy_loc , buildingDims , bSeper, shots , shotWasHi
     # Plotting the side view of the map
     plt.subplot(1,2,2)
     plt.title("Side Drone View ("+r"$\phi\,$"+" axis)"); plt.xlabel(r"$\beta\,$"+' axis (cm)'); plt.ylabel(r"$\gamma\,$"+' axis (cm)')
-    yourBuildingYZ = plt.Rectangle((0,0) , buildingDims[1] , buildingDims[2] , fc='grey',ec="black",zorder=1.)
-    enemyBuildingYZ = plt.Rectangle((buildingDims[1]*sepCoeff+bSeper,0) , buildingDims[1] , buildingDims[2] , fc='grey',ec="black",zorder=1.)
+    yourBuildingYZ = plt.Rectangle((0,0) , buildingDims[1] , buildingDims[2] , fc='silver',ec="black",zorder=1.)
+    enemyBuildingYZ = plt.Rectangle((buildingDims[1]*sepCoeff+bSeper,0) , buildingDims[1] , buildingDims[2] , fc='silver',ec="black",zorder=1.)
     plt.gca().add_patch(yourBuildingYZ)
     plt.gca().add_patch(enemyBuildingYZ)
+    plt.gca().set_facecolor('dimgray')
     
     if plotPlayers:
         if (plotHitBoxes):
@@ -326,7 +328,7 @@ def log_posterior2(params, x, y, param_bounds , knownP):
 Function used to start the encounter between the player and the antagonist
 """
 def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , buildingDims=[] , bSeper=0. , 
-              hit_tolerance=0 , confidence_tolerance=0.68 , emceeAtEach=10 , start_MCing_at = 20 , shotsAllowed=100 , 
+              hit_tolerance=0 , confidence_tolerance=0.68 , emceeAtEach=10 , start_MCing_at = 20 , shotsAllowed=80 , 
               log_post1=True , easyMode=False , hardMode=True , doPrint=True , doPlot=True , doCornerPlot=True):
     """
     your_loc , enemy_loc , buildingDims , bSeper : 
@@ -353,7 +355,7 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
     # shotWasHit collects boolean values on whether a certain shot was a hit or not
     shotsSeenByDrone = [];  shotsForCheckHit = [];  shotsForVisualize = [];  shotsReceived = [];  shotWasHit = [];  shotsFiredByEnemy = 0
     alpha_min = 0.;  alpha_max = buildingDims[0]
-    beta_min = bSeper;  beta_max = buildingDims[1] + bSeper
+    beta_min = 0;  beta_max = buildingDims[1] + bSeper
     gamma_min = 0.;  gamma_max = buildingDims[2]
     
     if (easyMode):
@@ -369,8 +371,7 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
     else:
         theta_range = [-np.pi/2,np.pi/2]
         phi_range = [  np.arctan(-enemy_loc[2]/(enemy_loc[1]-buildingDims[1])) , np.pi/2  ]
-        print("Normal mode. Firing angles will now be directed anywhere where the drones could potentially see them.")
-    if doPrint: print("theta_range = " +str(theta_range)+ " and phi_range = " +str(phi_range))
+        print("Normal mode. Firing angles are now restricted so that they dont hit the ground before exiting their building of origin.")
     print("")
     
     # MCMC parameters
@@ -385,7 +386,7 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
     numMCMCs = 0
     
     # While the X and Z confidence regions are to high, continue receiving shots
-    while((confidenceRegionX > enemy_hitbox[0] or confidenceRegionZ > enemy_hitbox[2]) and shotsFiredByEnemy <= shotsAllowed):
+    while((confidenceRegionX > enemy_hitbox[0] or confidenceRegionZ > enemy_hitbox[2]) and shotsFiredByEnemy < shotsAllowed):
         
         theta = np.random.uniform( theta_range[0] , theta_range[1] )
         phi = np.random.uniform( phi_range[0] , phi_range[1] )
@@ -460,7 +461,7 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
         if (wasShotAHit(enemy_loc , bestShot , enemy_hitbox , shotFrom=your_loc)):
             print("You got lucky and lived. With those confidence intervals, that was almost like shooting blind. But your desperate shot worked")
         else:
-            print("What a conundrum. Both of you are out of ammo. After some discussion, it has been agreed that life and" 
+            print("What a conundrum. Both of you are out of ammo. After some discussion, it has been agreed that life and " 
               +"death shall be decided by a game of rock-paper-scissors")
     else:
         # take best shot, hit the other (hopefully)
