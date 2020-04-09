@@ -13,8 +13,7 @@ import emcee
 
 
 
-def setup( buildingDims=[] , bSeper=0. , blue_loc=[] , red_loc=[] , 
-                           red_hitbox=[] , blue_hitbox=[] , doPrint=True):
+def setup( buildingDims=[] , bSeper=0. , blue_loc=[] , red_loc=[] , red_hitbox=[] , blue_hitbox=[] , doPrint=True):
     """
     buildingDims : 1D array
             The 3D dimensions [x,y,z] (or [alpha,beta,gamma] if you prefer) in cm of both buildings on the map
@@ -23,7 +22,7 @@ def setup( buildingDims=[] , bSeper=0. , blue_loc=[] , red_loc=[] ,
     blueLoc , redLoc : 1D array
             Location in 3D space ([x,y,z]) of each person within their respective buildings. Should be within building limits.
     blue_hitbox , red_hitbox : 1D array
-            3D volume of each player. Input with [x,y,z] lengths
+            3D volume of each person. Input with [x,y,z] lengths
     """
     if (len(buildingDims) == 0):
         buildingDims = [1500. , 500. , 1000.]
@@ -92,9 +91,9 @@ def shotAtLocationY( theta , phi , shotOrigin , yloc=0 ):
 
 
 """
-Returns True/False whether a given shot destination was able to hit within the hitbox of a player location.
+Returns True/False whether a given shot destination was able to hit within the hitbox of a person's location.
 If the shot coordinate does not fall within this hitbox, the trajectory of the shot is analyzed to determine
-whether its path crossed the player hitbox
+whether its path crossed the hitbox of interest
 """
 def wasShotAHit(loc , shot , hitbox , shotFrom=[]):
     """
@@ -340,7 +339,7 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
               'emceeAtEach' tells the algorithm to perform a new MCMC after 'n' number of new shots detected.
             - 'start_MCing_at' tells the algorithm to start the first MCMC after 'n' number of shots detected
     easyMode , hardMode : boolean
-            Decides if the allowed firing angles for the red shooter are spread out or constrained to hit blue building. Default is hardMode
+            Decides if the allowed firing angles for the Red are spread out or constrained to hit Blue's building. Default is hardMode
     doPrint , doPlot , doCornerPlot : boolean
             'doPrint' allows certain additional info to be printed. 'doPlot' and 'doCornerPlot' decide if the game map and parameter corner
             maps from the MCMC are created.
@@ -353,7 +352,7 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
     # shotsForVisualize collects shot coordinates to be plotted onto the map
     # shotsReceived collects shots that were a hit on Blue
     # shotWasHit collects boolean values on whether a certain shot was a hit or not
-    shotsSeenByDrone = [];  shotsForCheckHit = [];  shotsForVisualize = [];  shotsReceived = [];  shotWasHit = [];  shotsFiredByred = 0
+    shotsSeenByDrone = [];  shotsForCheckHit = [];  shotsForVisualize = [];  shotsReceived = [];  shotWasHit = [];  shotsFiredByRed = 0
     alpha_min = 0.;  alpha_max = buildingDims[0]
     beta_min = 0;  beta_max = buildingDims[1] + bSeper
     gamma_min = 0.;  gamma_max = buildingDims[2]
@@ -387,15 +386,15 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
     blueShotNotTaken = True
     
     # While the X and Z confidence regions are to high, continue receiving shots
-    #while((confidenceRegionX > red_hitbox[0] or confidenceRegionZ > red_hitbox[2]) and shotsFiredByred < shotsAllowed):
-    while(shotsFiredByred < shotsAllowed):
+    #while((confidenceRegionX > red_hitbox[0] or confidenceRegionZ > red_hitbox[2]) and shotsFiredByRed < shotsAllowed):
+    while(shotsFiredByRed < shotsAllowed):
         
         theta = np.random.uniform( theta_range[0] , theta_range[1] )
         phi = np.random.uniform( phi_range[0] , phi_range[1] )
         shotsSeenByDrone.append( shotAtLocationY(theta , phi , red_loc , yloc=buildingDims[1]) ) # bSeper stuff here
         shotsForCheckHit.append( shotAtLocationY(theta , phi , red_loc , yloc=blue_loc[1]) )
         shotsForVisualize.append( shotAtLocationY(theta , phi , red_loc , yloc=0) )
-        shotsFiredByred += 1
+        shotsFiredByRed += 1
         
         if (wasShotAHit(blue_loc , shotsForCheckHit[-1] , blue_hitbox)):
             if doPrint: print("Shot hit Blue at " + str(shotsForCheckHit[-1]))
@@ -405,12 +404,12 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
             shotWasHit.append(False)
             
         if (hit_tolerance < len(shotsReceived)):
-            print("Blue DIED. Red landed " + str(len(shotsReceived)) + " out of " + str(shotsFiredByred) + " of his shots")
+            print("Blue DIED. Red landed " + str(len(shotsReceived)) + " out of " + str(shotsFiredByRed) + " of his shots")
             if doPlot: plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , 
                                     shotWasHit , blue_hitbox , red_hitbox , ylevel=0)
-            return
+            break
         
-        if (np.mod(shotsFiredByred,emceeAtEach) == 0 and shotsFiredByred >= start_MCing_at and blueShotNotTaken==True):
+        if (np.mod(shotsFiredByRed,emceeAtEach) == 0 and shotsFiredByRed >= start_MCing_at and blueShotNotTaken==True):
             
             # MCMC part of the code
             initial_pos = bestShot + 0.01 * np.random.randn(nwalkers, paramDims)
@@ -444,7 +443,7 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
                 # take best shot, hit the other (hopefully)
                 bestShot[1] = bestShot[1] + buildingDims[1]
                 if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc)):
-                    print("SUCCESSFUL HIT. Bayesian Inference triumphs at the Battle of Two Buildings! Blue can now go home to his family and celebrate")
+                    print("SUCCESSFUL HIT. Bayesian Inference triumphs in battle! Blue can now go home to his family and celebrate")
                     break
                 else:
                     print("Blue missed! Bayesian Inference is a lie! Screw you Bayes!")
@@ -472,7 +471,7 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
                                   blue_hitbox , red_hitbox , ylevel=0 , blueShot=visualizeBestShot , emceeOutput=bestShot)
     
     
-    if(shotsFiredByred >= shotsAllowed):
+    if(shotsFiredByRed >= shotsAllowed):
         # take best shot anyways, see what gives
         if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc) and blueShotNotTaken==True):
             print("Blue got lucky and lived. With those confidence intervals, that was almost like shooting blind. But his desperate shot worked")
@@ -484,7 +483,7 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
         
         
     print('')    
-    print(str(shotsFiredByred)+" shots were fired by Red")
+    print(str(shotsFiredByRed)+" shots were fired by Red")
     print(str(numMCMCs)+" MCMCs were executed")
     print("THE END")
 
