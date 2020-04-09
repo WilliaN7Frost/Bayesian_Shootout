@@ -13,63 +13,63 @@ import emcee
 
 
 
-def setup( buildingDims=[] , bSeper=0. , your_loc=[] , enemy_loc=[] , 
-                           enemy_hitbox=[] , your_hitbox=[] , doPrint=True):
+def setup( buildingDims=[] , bSeper=0. , blue_loc=[] , red_loc=[] , 
+                           red_hitbox=[] , blue_hitbox=[] , doPrint=True):
     """
     buildingDims : 1D array
             The 3D dimensions [x,y,z] (or [alpha,beta,gamma] if you prefer) in cm of both buildings on the map
     bSeper : float
             Seperation between buildings in cm
-    yourLoc , enemyLoc : 1D array
-            Location in 3D space ([x,y,z]) of each player within their respective buildings. Should be within building limits.
-    your_hitbox , enemy_hitbox : 1D array
+    blueLoc , redLoc : 1D array
+            Location in 3D space ([x,y,z]) of each person within their respective buildings. Should be within building limits.
+    blue_hitbox , red_hitbox : 1D array
             3D volume of each player. Input with [x,y,z] lengths
     """
     if (len(buildingDims) == 0):
         buildingDims = [1500. , 500. , 1000.]
-    if (len(your_hitbox) == 0):
-        your_hitbox = [100. , 50. , 200.]
-    if (len(enemy_hitbox) == 0):
-        enemy_hitbox = [100. , 50. , 200.]
+    if (len(blue_hitbox) == 0):
+        blue_hitbox = [100. , 50. , 200.]
+    if (len(red_hitbox) == 0):
+        red_hitbox = [100. , 50. , 200.]
     
-    if (len(enemy_loc)!=0):
-        if ( enemy_loc[0] > buildingDims[0]-enemy_hitbox[0]/2 ): enemy_loc[0] = buildingDims[0]-enemy_hitbox[0]/2
-        if ( enemy_loc[0] < enemy_hitbox[0]/2 ): enemy_loc[0] = enemy_hitbox[0]/2
-        if ( enemy_loc[1] > buildingDims[1]-enemy_hitbox[1]/2 ): enemy_loc[1] = buildingDims[1]-enemy_hitbox[1]/2
-        if ( enemy_loc[1] < enemy_hitbox[1]/2 ): enemy_loc[1] = enemy_hitbox[1]/2
-        if ( enemy_loc[2] > buildingDims[2]-enemy_hitbox[2]/2 ): enemy_loc[2] = buildingDims[2]-enemy_hitbox[2]/2
-        if ( enemy_loc[2] < enemy_hitbox[2]/2 ): enemy_loc[2] = enemy_hitbox[2]/2
+    if (len(red_loc)!=0):
+        if ( red_loc[0] > buildingDims[0]-red_hitbox[0]/2 ): red_loc[0] = buildingDims[0]-red_hitbox[0]/2
+        if ( red_loc[0] < red_hitbox[0]/2 ): red_loc[0] = red_hitbox[0]/2
+        if ( red_loc[1] > buildingDims[1]-red_hitbox[1]/2 ): red_loc[1] = buildingDims[1]-red_hitbox[1]/2
+        if ( red_loc[1] < red_hitbox[1]/2 ): red_loc[1] = red_hitbox[1]/2
+        if ( red_loc[2] > buildingDims[2]-red_hitbox[2]/2 ): red_loc[2] = buildingDims[2]-red_hitbox[2]/2
+        if ( red_loc[2] < red_hitbox[2]/2 ): red_loc[2] = red_hitbox[2]/2
     else:
-        enemy_loc = np.zeros(3)
+        red_loc = np.zeros(3)
         for i in range(3):
-            enemy_loc[i] = np.random.randint(low = enemy_hitbox[i] , high = buildingDims[i]-enemy_hitbox[i])
-    enemy_loc[1] += buildingDims[1] + bSeper
+            red_loc[i] = np.random.randint(low = red_hitbox[i] , high = buildingDims[i]-red_hitbox[i]+1)
+    red_loc[1] += buildingDims[1] + bSeper
     
-    if (len(your_loc)!=0):
-        if ( your_loc[0] > buildingDims[0]-your_hitbox[0]/2 ): your_loc[0] = buildingDims[0]-your_hitbox[0]/2
-        if ( your_loc[0] < your_hitbox[0]/2 ): your_loc[0] = your_hitbox[0]/2
-        if ( your_loc[1] > buildingDims[1]-your_hitbox[1]/2 ): your_loc[1] = buildingDims[1]-your_hitbox[1]/2
-        if ( your_loc[1] < your_hitbox[1]/2 ): your_loc[1] = your_hitbox[1]/2
-        if ( your_loc[2] > buildingDims[2]-your_hitbox[2]/2 ): your_loc[2] = buildingDims[2]-your_hitbox[2]/2
-        if ( your_loc[2] < your_hitbox[2]/2 ): your_loc[2] = your_hitbox[2]/2
+    if (len(blue_loc)!=0):
+        if ( blue_loc[0] > buildingDims[0]-blue_hitbox[0]/2 ): blue_loc[0] = buildingDims[0]-blue_hitbox[0]/2
+        if ( blue_loc[0] < blue_hitbox[0]/2 ): blue_loc[0] = blue_hitbox[0]/2
+        if ( blue_loc[1] > buildingDims[1]-blue_hitbox[1]/2 ): blue_loc[1] = buildingDims[1]-blue_hitbox[1]/2
+        if ( blue_loc[1] < blue_hitbox[1]/2 ): blue_loc[1] = blue_hitbox[1]/2
+        if ( blue_loc[2] > buildingDims[2]-blue_hitbox[2]/2 ): blue_loc[2] = buildingDims[2]-blue_hitbox[2]/2
+        if ( blue_loc[2] < blue_hitbox[2]/2 ): blue_loc[2] = blue_hitbox[2]/2
     else:
-        your_loc = np.zeros(3)
+        blue_loc = np.zeros(3)
         for i in range(3):
-            your_loc[i] = np.random.randint(low = your_hitbox[i] , high = buildingDims[i]-your_hitbox[i])
+            blue_loc[i] = np.random.randint(low = blue_hitbox[i] , high = buildingDims[i]-blue_hitbox[i]+1)
     
     if doPrint:
         print("Building dimensions are " + str(buildingDims) + " (cm)")
         print("Buildings Seperated by " + str(bSeper) + " cm")
-        print("You Located at " + str(your_loc) + " and hitbox within " 
-              + str( [[your_loc[0]-your_hitbox[0]/2,your_loc[0]+your_hitbox[0]/2]
-                      ,[your_loc[1]-your_hitbox[1]/2,your_loc[1]+your_hitbox[1]/2]
-                       ,[your_loc[2]-your_hitbox[2]/2,your_loc[2]+your_hitbox[2]/2]] ))
-        print("Enemy Located at " + str(enemy_loc) + " and hitbox within " 
-          + str( [[enemy_loc[0]-enemy_hitbox[0]/2,enemy_loc[0]+enemy_hitbox[0]/2]
-                  ,[enemy_loc[1]-enemy_hitbox[1]/2,enemy_loc[1]+enemy_hitbox[1]/2]
-                   ,[enemy_loc[2]-enemy_hitbox[2]/2,enemy_loc[2]+enemy_hitbox[2]/2]] ))
+        print("Blue Located at " + str(blue_loc) + " and hitbox within " 
+              + str( [[blue_loc[0]-blue_hitbox[0]/2,blue_loc[0]+blue_hitbox[0]/2]
+                      ,[blue_loc[1]-blue_hitbox[1]/2,blue_loc[1]+blue_hitbox[1]/2]
+                       ,[blue_loc[2]-blue_hitbox[2]/2,blue_loc[2]+blue_hitbox[2]/2]] ))
+        print("Red Located at " + str(red_loc) + " and hitbox within " 
+          + str( [[red_loc[0]-red_hitbox[0]/2,red_loc[0]+red_hitbox[0]/2]
+                  ,[red_loc[1]-red_hitbox[1]/2,red_loc[1]+red_hitbox[1]/2]
+                   ,[red_loc[2]-red_hitbox[2]/2,red_loc[2]+red_hitbox[2]/2]] ))
     
-    return buildingDims , bSeper , enemy_loc , your_loc , enemy_hitbox , your_hitbox
+    return buildingDims , bSeper , red_loc , blue_loc , red_hitbox , blue_hitbox
 
 
 
@@ -132,21 +132,21 @@ def wasShotAHit(loc , shot , hitbox , shotFrom=[]):
 """
 The mother of all plot functions. Allows you to visualize the map, shots taken and results from MCMC
 """
-def plotShots2D( your_loc , enemy_loc , buildingDims , bSeper, shots , shotWasHit , your_hitbox , 
-                 enemy_hitbox , ylevel=0 , yourShot=[] , emceeOutput=[] , multipleMC_outs=[] , 
+def plotShots2D( blue_loc , red_loc , buildingDims , bSeper, shots , shotWasHit , blue_hitbox , 
+                 red_hitbox , ylevel=0 , blueShot=[] , emceeOutput=[] , multipleMC_outs=[] , 
                  plotHitBoxes=True , plotDotsForManyMC=False , plotAllShots=True , plotPlayers=True ,
                  plotMultMCshots=False):
     """
-    your_loc , enemy_loc , buildingDims , bSeper , your_hitbox , enemy_hitbox : 
+    blue_loc , red_loc , buildingDims , bSeper , blue_hitbox , red_hitbox : 
             Refer to the setup() function for explanations on these parameters
             
     shots , shotWasHit : 2D and 1D arrays respectively
             'shots' holds in each element a 3D coordinate cooresponding to a shot destination. 'shotWasHit' should contain 
-             an ordering of boolean values for which the nth element specifies if the nth shot was a hit against you or not.
+             an ordering of boolean values for which the nth element specifies if the nth shot was a hit against Blue or not.
    
-    ylevel , yourShot : int and 1D array
+    ylevel , blueShot : int and 1D array
             'ylevel' refers to the depth in y (beta) that we want our shots to be shown reaching on the map.
-            If 'yourShot' is supplied, it corresponds to the 3D coordinate that you decided to aim at.
+            If 'blueShot' is supplied, it corresponds to the 3D coordinate that Blue decided to aim at.
             
     emceeOutput , multipleMC_outs , plotDotsForManyMC , plotMultMCshots : 1D , 3D arrays and boolean values
     
@@ -161,7 +161,7 @@ def plotShots2D( your_loc , enemy_loc , buildingDims , bSeper, shots , shotWasHi
     plotHitBoxes , plotPlayers , plotAllShots : boolean
             'plotHitBoxes' tells us to print players as rectangles or dots
             'plotPlayers'  tells us whether to plot players onto the map or not
-            'plotAllShots' tells us to print the shots from the enemy shooter or not
+            'plotAllShots' tells us to print the shots from the red shooter or not
     """
     
     plt.rc('font', size=14)          # controls default text sizes
@@ -180,32 +180,32 @@ def plotShots2D( your_loc , enemy_loc , buildingDims , bSeper, shots , shotWasHi
     # Plotting the top view of the map
     plt.subplot(1,2,1)
     plt.title("Top Drone View ("+r"$\theta\,$"+" axis)"); plt.xlabel(r"$\alpha\,$"+' axis (cm)'); plt.ylabel(r"$\beta\,$"+' axis (cm)')
-    yourBuildingXY = plt.Rectangle((0,0) , buildingDims[0] , buildingDims[1] , fc='silver',ec="black",zorder=1.)
-    enemyBuildingXY = plt.Rectangle((0,buildingDims[1]*sepCoeff+bSeper) , buildingDims[0] , buildingDims[1] , fc='silver',ec="black",zorder=1.)
-    plt.gca().add_patch(yourBuildingXY)
-    plt.gca().add_patch(enemyBuildingXY)
+    blueBuildingXY = plt.Rectangle((0,0) , buildingDims[0] , buildingDims[1] , fc='silver',ec="black",zorder=1.)
+    redBuildingXY = plt.Rectangle((0,buildingDims[1]*sepCoeff+bSeper) , buildingDims[0] , buildingDims[1] , fc='silver',ec="black",zorder=1.)
+    plt.gca().add_patch(blueBuildingXY)
+    plt.gca().add_patch(redBuildingXY)
     plt.gca().set_facecolor('dimgray')
     
     if plotPlayers:
         if (plotHitBoxes):
-            yourBoxXY = plt.Rectangle( (your_loc[0]-your_hitbox[0]/2 , your_loc[1]-your_hitbox[1]/2)
-                                , your_hitbox[0] , your_hitbox[1] , fc='blue' , ec="black" , zorder=10.)
-            enemyBoxXY = plt.Rectangle( (enemy_loc[0]-enemy_hitbox[0]/2 , enemy_loc[1]-enemy_hitbox[1]/2+buildingDims[1]*(sepCoeff-1))
-                                , enemy_hitbox[0] , enemy_hitbox[1] , fc='red' , ec="black" , zorder=10.)
-            plt.gca().add_patch(yourBoxXY)
-            plt.gca().add_patch(enemyBoxXY)
+            blueBoxXY = plt.Rectangle( (blue_loc[0]-blue_hitbox[0]/2 , blue_loc[1]-blue_hitbox[1]/2)
+                                , blue_hitbox[0] , blue_hitbox[1] , fc='blue' , ec="black" , zorder=10.)
+            redBoxXY = plt.Rectangle( (red_loc[0]-red_hitbox[0]/2 , red_loc[1]-red_hitbox[1]/2+buildingDims[1]*(sepCoeff-1))
+                                , red_hitbox[0] , red_hitbox[1] , fc='red' , ec="black" , zorder=10.)
+            plt.gca().add_patch(blueBoxXY)
+            plt.gca().add_patch(redBoxXY)
         else:
-            plt.scatter( your_loc[0]  , your_loc[1] , label='You' , color='blue' , zorder=10.)
-            plt.scatter( enemy_loc[0] , enemy_loc[1]+buildingDims[1]*(sepCoeff-1) , label='Enemy' , color='red' , zorder=10.)
+            plt.scatter( blue_loc[0]  , blue_loc[1] , label='Blue' , color='blue' , zorder=10.)
+            plt.scatter( red_loc[0] , red_loc[1]+buildingDims[1]*(sepCoeff-1) , label='Red' , color='red' , zorder=10.)
     if plotAllShots:
         for i, color in enumerate(colors):
             if (shotWasHit[i]):
-                plt.plot( [enemy_loc[0],shots[i][0]] , [enemy_loc[1],ylevel] , color='black' , linewidth=3 , zorder=4.0)
+                plt.plot( [red_loc[0],shots[i][0]] , [red_loc[1],ylevel] , color='black' , linewidth=3 , zorder=4.0)
             else:
-                plt.plot( [enemy_loc[0],shots[i][0]] , [enemy_loc[1],ylevel] , color=color , zorder=2.0)
+                plt.plot( [red_loc[0],shots[i][0]] , [red_loc[1],ylevel] , color=color , zorder=2.0)
     
-    if (len(yourShot) != 0):
-        plt.plot( [your_loc[0],yourShot[0]] ,  [your_loc[1],yourShot[1]] , color='white' , linewidth=3 , zorder=6.0)
+    if (len(blueShot) != 0):
+        plt.plot( [blue_loc[0],blueShot[0]] ,  [blue_loc[1],blueShot[1]] , color='white' , linewidth=3 , zorder=6.0)
     if (len(emceeOutput) != 0):
         plt.scatter( emceeOutput[0]  , emceeOutput[1] , s=81 , label='mcmcOutput' , marker='o' , ec='black',linewidth=2 , color='Yellow' , zorder=15.)
     elif (len(multipleMC_outs) != 0):
@@ -230,32 +230,32 @@ def plotShots2D( your_loc , enemy_loc , buildingDims , bSeper, shots , shotWasHi
     # Plotting the side view of the map
     plt.subplot(1,2,2)
     plt.title("Side Drone View ("+r"$\phi\,$"+" axis)"); plt.xlabel(r"$\beta\,$"+' axis (cm)'); plt.ylabel(r"$\gamma\,$"+' axis (cm)')
-    yourBuildingYZ = plt.Rectangle((0,0) , buildingDims[1] , buildingDims[2] , fc='silver',ec="black",zorder=1.)
-    enemyBuildingYZ = plt.Rectangle((buildingDims[1]*sepCoeff+bSeper,0) , buildingDims[1] , buildingDims[2] , fc='silver',ec="black",zorder=1.)
-    plt.gca().add_patch(yourBuildingYZ)
-    plt.gca().add_patch(enemyBuildingYZ)
+    blueBuildingYZ = plt.Rectangle((0,0) , buildingDims[1] , buildingDims[2] , fc='silver',ec="black",zorder=1.)
+    redBuildingYZ = plt.Rectangle((buildingDims[1]*sepCoeff+bSeper,0) , buildingDims[1] , buildingDims[2] , fc='silver',ec="black",zorder=1.)
+    plt.gca().add_patch(blueBuildingYZ)
+    plt.gca().add_patch(redBuildingYZ)
     plt.gca().set_facecolor('dimgray')
     
     if plotPlayers:
         if (plotHitBoxes):
-            yourBoxYZ = plt.Rectangle( (your_loc[1]-your_hitbox[1]/2,your_loc[2]-your_hitbox[2]/2)
-                                , your_hitbox[1] , your_hitbox[2] , fc='blue',ec="black",zorder=10.)
-            enemyBoxYZ = plt.Rectangle( (enemy_loc[1]-enemy_hitbox[1]/2+buildingDims[1]*(sepCoeff-1) , enemy_loc[2]-enemy_hitbox[2]/2)
-                                , enemy_hitbox[1] , enemy_hitbox[2] , fc='red',ec="black",zorder=10.)
-            plt.gca().add_patch(yourBoxYZ)
-            plt.gca().add_patch(enemyBoxYZ)
+            blueBoxYZ = plt.Rectangle( (blue_loc[1]-blue_hitbox[1]/2,blue_loc[2]-blue_hitbox[2]/2)
+                                , blue_hitbox[1] , blue_hitbox[2] , fc='blue',ec="black",zorder=10.)
+            redBoxYZ = plt.Rectangle( (red_loc[1]-red_hitbox[1]/2+buildingDims[1]*(sepCoeff-1) , red_loc[2]-red_hitbox[2]/2)
+                                , red_hitbox[1] , red_hitbox[2] , fc='red',ec="black",zorder=10.)
+            plt.gca().add_patch(blueBoxYZ)
+            plt.gca().add_patch(redBoxYZ)
         else:
-            plt.scatter( your_loc[1]  , your_loc[2] , label='You' , color='blue' , zorder=10.)
-            plt.scatter( enemy_loc[1]+buildingDims[1]*(sepCoeff-1) , enemy_loc[2] , label='Enemy' , color='red' , zorder=10.)
+            plt.scatter( blue_loc[1]  , blue_loc[2] , label='Blue' , color='blue' , zorder=10.)
+            plt.scatter( red_loc[1]+buildingDims[1]*(sepCoeff-1) , red_loc[2] , label='Red' , color='red' , zorder=10.)
     if plotAllShots:   
         for i, color in enumerate(colors):
             if (shotWasHit[i]):
-                plt.plot( [enemy_loc[1],ylevel],[enemy_loc[2],shots[i][2]] , color='black' , linewidth=3 , zorder=4.) 
+                plt.plot( [red_loc[1],ylevel],[red_loc[2],shots[i][2]] , color='black' , linewidth=3 , zorder=4.) 
             else:
-                plt.plot( [enemy_loc[1],ylevel],[enemy_loc[2],shots[i][2]] , color=color , zorder=2.)
+                plt.plot( [red_loc[1],ylevel],[red_loc[2],shots[i][2]] , color=color , zorder=2.)
     
-    if (len(yourShot)!=0):
-        plt.plot( [your_loc[1],yourShot[1]] ,  [your_loc[2],yourShot[2]] , color='white' , linewidth=3 , zorder=6.0)
+    if (len(blueShot)!=0):
+        plt.plot( [blue_loc[1],blueShot[1]] ,  [blue_loc[2],blueShot[2]] , color='white' , linewidth=3 , zorder=6.0)
     if (len(emceeOutput) != 0):
         plt.scatter( emceeOutput[1]  , emceeOutput[2] , s=81 , label='mcmcOutput' , marker='o' , ec='black',linewidth=2 , color='Yellow' , zorder=15.)
     elif (len(multipleMC_outs) != 0):
@@ -327,11 +327,11 @@ def log_posterior2(params, x, y, param_bounds , knownP):
 """
 Function used to start the encounter between the player and the antagonist
 """
-def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , buildingDims=[] , bSeper=0. , 
+def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buildingDims=[] , bSeper=0. , 
               hit_tolerance=0 , confidence_tolerance=0.68 , emceeAtEach=10 , start_MCing_at = 20 , shotsAllowed=80 , 
               log_post1=True , easyMode=False , hardMode=True , doPrint=True , doPlot=True , doCornerPlot=True):
     """
-    your_loc , enemy_loc , buildingDims , bSeper : 
+    blue_loc , red_loc , buildingDims , bSeper : 
             Refer to the setup() function for explanations on these parameters
     confidence_tolerance , emceeAtEach , start_MCing_at : 
             - 'confidence_tolerance' refers to the n% confidence region we want the algorithm to use to know when to stop.
@@ -340,20 +340,20 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
               'emceeAtEach' tells the algorithm to perform a new MCMC after 'n' number of new shots detected.
             - 'start_MCing_at' tells the algorithm to start the first MCMC after 'n' number of shots detected
     easyMode , hardMode : boolean
-            Decides if the allowed firing angles for the enemy shooter are spread out or constrained to hit your building. Default is hardMode
+            Decides if the allowed firing angles for the red shooter are spread out or constrained to hit blue building. Default is hardMode
     doPrint , doPlot , doCornerPlot : boolean
             'doPrint' allows certain additional info to be printed. 'doPlot' and 'doCornerPlot' decide if the game map and parameter corner
             maps from the MCMC are created.
     """
     
-    buildingDims, bSeper, enemy_loc, your_loc, enemy_hitbox, your_hitbox = setup(your_loc=your_loc,enemy_loc=enemy_loc,buildingDims=buildingDims,bSeper=bSeper,your_hitbox=your_hitbox,enemy_hitbox=enemy_hitbox)
+    buildingDims, bSeper, red_loc, blue_loc, red_hitbox, blue_hitbox = setup(blue_loc=blue_loc,red_loc=red_loc,buildingDims=buildingDims,bSeper=bSeper,blue_hitbox=blue_hitbox,red_hitbox=red_hitbox)
         
     # shotsSeenByDrone collects the shot coordinates used to run the MCMC
-    # shotsForCheckHit collects the shot coordinates used to check if a shot was a hit against you
+    # shotsForCheckHit collects the shot coordinates used to check if a shot was a hit against Blue
     # shotsForVisualize collects shot coordinates to be plotted onto the map
-    # shotsReceived collects shots that were a hit on you
+    # shotsReceived collects shots that were a hit on Blue
     # shotWasHit collects boolean values on whether a certain shot was a hit or not
-    shotsSeenByDrone = [];  shotsForCheckHit = [];  shotsForVisualize = [];  shotsReceived = [];  shotWasHit = [];  shotsFiredByEnemy = 0
+    shotsSeenByDrone = [];  shotsForCheckHit = [];  shotsForVisualize = [];  shotsReceived = [];  shotWasHit = [];  shotsFiredByred = 0
     alpha_min = 0.;  alpha_max = buildingDims[0]
     beta_min = 0;  beta_max = buildingDims[1] + bSeper
     gamma_min = 0.;  gamma_max = buildingDims[2]
@@ -363,14 +363,14 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
         phi_range = [-np.pi/2,np.pi/2]
         print("Easy Mode. All firing angles all permitted")
     elif (hardMode):
-        theta_range = [  np.arctan(-enemy_loc[0]/(enemy_loc[1]-buildingDims[1])) , 
-                         np.arctan((buildingDims[0]-enemy_loc[0])/(enemy_loc[1]-buildingDims[1]))  ]
-        phi_range = [  np.arctan(-enemy_loc[2]/(enemy_loc[1]-buildingDims[1])) , 
-                       np.arctan((buildingDims[2]-enemy_loc[2])/(enemy_loc[1]-buildingDims[1]))  ]
-        print("Hard mode. Firing angles will now be directed strictly towards the opposing building.")
+        theta_range = [  np.arctan(-red_loc[0]/(red_loc[1]-buildingDims[1])) , 
+                         np.arctan((buildingDims[0]-red_loc[0])/(red_loc[1]-buildingDims[1]))  ]
+        phi_range = [  np.arctan(-red_loc[2]/(red_loc[1]-buildingDims[1])) , 
+                       np.arctan((buildingDims[2]-red_loc[2])/(red_loc[1]-buildingDims[1]))  ]
+        print("Hard mode. Firing angles will now be directed strictly towards Blue's building.")
     else:
         theta_range = [-np.pi/2,np.pi/2]
-        phi_range = [  np.arctan(-enemy_loc[2]/(enemy_loc[1]-buildingDims[1])) , np.pi/2  ]
+        phi_range = [  np.arctan(-red_loc[2]/(red_loc[1]-buildingDims[1])) , np.pi/2  ]
         print("Normal mode. Firing angles are now restricted so that they dont hit the ground before exiting their building of origin.")
     print("")
     
@@ -384,32 +384,34 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
     confidenceRegionY = beta_max-beta_min
     confidenceRegionZ = gamma_max-gamma_min
     numMCMCs = 0
+    blueShotNotTaken = True
     
     # While the X and Z confidence regions are to high, continue receiving shots
-    while((confidenceRegionX > enemy_hitbox[0] or confidenceRegionZ > enemy_hitbox[2]) and shotsFiredByEnemy < shotsAllowed):
+    #while((confidenceRegionX > red_hitbox[0] or confidenceRegionZ > red_hitbox[2]) and shotsFiredByred < shotsAllowed):
+    while(shotsFiredByred < shotsAllowed):
         
         theta = np.random.uniform( theta_range[0] , theta_range[1] )
         phi = np.random.uniform( phi_range[0] , phi_range[1] )
-        shotsSeenByDrone.append( shotAtLocationY(theta , phi , enemy_loc , yloc=buildingDims[1]) ) # bSeper stuff here
-        shotsForCheckHit.append( shotAtLocationY(theta , phi , enemy_loc , yloc=your_loc[1]) )
-        shotsForVisualize.append( shotAtLocationY(theta , phi , enemy_loc , yloc=0) )
-        shotsFiredByEnemy += 1
+        shotsSeenByDrone.append( shotAtLocationY(theta , phi , red_loc , yloc=buildingDims[1]) ) # bSeper stuff here
+        shotsForCheckHit.append( shotAtLocationY(theta , phi , red_loc , yloc=blue_loc[1]) )
+        shotsForVisualize.append( shotAtLocationY(theta , phi , red_loc , yloc=0) )
+        shotsFiredByred += 1
         
-        if (wasShotAHit(your_loc , shotsForCheckHit[-1] , your_hitbox)):
-            if doPrint: print("Shot hit you at " + str(shotsForCheckHit[-1]))
+        if (wasShotAHit(blue_loc , shotsForCheckHit[-1] , blue_hitbox)):
+            if doPrint: print("Shot hit Blue at " + str(shotsForCheckHit[-1]))
             shotsReceived.append( shotsForCheckHit[-1] )
             shotWasHit.append(True)
         else:
             shotWasHit.append(False)
             
         if (hit_tolerance < len(shotsReceived)):
-            print("YOU DIED. Shots to the body were felt at x,y,z = " + str(shotsReceived))
-            print(str(shotsFiredByEnemy)+" shots were fired by the opponent")
-            if doPlot: plotShots2D( your_loc , enemy_loc , buildingDims , bSeper , shotsForVisualize , 
-                                    shotWasHit , your_hitbox , enemy_hitbox , ylevel=0)
+            print("Blue DIED. Shots to the body were felt at x,y,z = " + str(shotsReceived))
+            print(str(shotsFiredByred)+" shots were fired by Red")
+            if doPlot: plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , 
+                                    shotWasHit , blue_hitbox , red_hitbox , ylevel=0)
             return
         
-        if (np.mod(shotsFiredByEnemy,emceeAtEach) == 0 and shotsFiredByEnemy >= start_MCing_at):
+        if (np.mod(shotsFiredByred,emceeAtEach) == 0 and shotsFiredByred >= start_MCing_at and blueShotNotTaken==True):
             
             # MCMC part of the code
             initial_pos = bestShot + 0.01 * np.random.randn(nwalkers, paramDims)
@@ -437,6 +439,19 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
                 print("Best Shot is now in direction of " + str( (bestShot[0],bestShot[1]+buildingDims[1],bestShot[2]) ))
                 print("Confidence interval of bestShot in x,y,z is " + str((confidenceRegionX,confidenceRegionY,confidenceRegionZ)) )
                 print("")
+            
+            if ( confidenceRegionX <= red_hitbox[0] and confidenceRegionZ <= red_hitbox[2] and blueShotNotTaken==True):
+                blueShotNotTaken = False
+                # take best shot, hit the other (hopefully)
+                bestShot[1] = bestShot[1] + buildingDims[1]
+                if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc)):
+                    print("SUCCESSFUL HIT. Bayesian Inference triumphs at the Battle of Two Buildings! Blue can now go home to his family and celebrate")
+                    break
+                else:
+                    bestShot[1] = bestShot[1] - buildingDims[1]
+                    print("Blue missed! Bayesian Inference is a lie! Screw you Bayes!")
+                    print('')
+    
     
     
     if doCornerPlot:
@@ -446,31 +461,32 @@ def beginGame(your_loc=[] , enemy_loc=[] , your_hitbox=[] , enemy_hitbox = [] , 
         corner.corner(param_collection, labels=[r"$\alpha\,$[cm]", r"$\beta\,$[cm]" , r"$\gamma\,$[cm]"] ,
               quantiles = [0.16,0.5,0.84] , show_titles=True )
     
+    
     # Since the MCMC searches for a coordinate within the opponents building, adjust the inferred coordinate
     # to accurately represent it on the map
     bestShot[1] = bestShot[1] + buildingDims[1]# + bSeper/2
-    # Using the angles of your shot, get a coordinate point such as to plot your shot on the map
-    visualizeBestShot = shotAtLocationY( -np.arctan( (bestShot[0]-your_loc[0])/(bestShot[1]-your_loc[1]) ) ,
-                               -np.arctan( (bestShot[2]-your_loc[2])/(bestShot[1]-your_loc[1]) ) , your_loc , yloc=2.1*buildingDims[1]+bSeper)
+    # Using the angles of blue shot, get a coordinate point such as to plot blue shot on the map
+    visualizeBestShot = shotAtLocationY( -np.arctan( (bestShot[0]-blue_loc[0])/(bestShot[1]-blue_loc[1]) ) ,
+                               -np.arctan( (bestShot[2]-blue_loc[2])/(bestShot[1]-blue_loc[1]) ) , blue_loc , yloc=2.1*buildingDims[1]+bSeper)
     
-    if doPlot: plotShots2D( your_loc , enemy_loc , buildingDims , bSeper , shotsForVisualize , shotWasHit , 
-                                  your_hitbox , enemy_hitbox , ylevel=0 , yourShot=visualizeBestShot , emceeOutput=bestShot)
     
-    if(shotsFiredByEnemy > shotsAllowed):
+    if doPlot: plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , shotWasHit , 
+                                  blue_hitbox , red_hitbox , ylevel=0 , blueShot=visualizeBestShot , emceeOutput=bestShot)
+    
+    
+    if(shotsFiredByred >= shotsAllowed):
         # take best shot anyways, see what gives
-        if (wasShotAHit(enemy_loc , bestShot , enemy_hitbox , shotFrom=your_loc)):
-            print("You got lucky and lived. With those confidence intervals, that was almost like shooting blind. But your desperate shot worked")
+        if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc)):
+            print("Blue got lucky and lived. With those confidence intervals, that was almost like shooting blind. But his desperate shot worked")
         else:
-            print("What a conundrum. Both of you are out of ammo. After some discussion, it has been agreed that life and " 
-              +"death shall be decided by a game of rock-paper-scissors")
-    else:
-        # take best shot, hit the other (hopefully)
-        if (wasShotAHit(enemy_loc , bestShot , enemy_hitbox , shotFrom=your_loc)):
-            print("SUCCESSFUL HIT. Bayesian Inference triumphs at the Battle of Two Buildings! Go home to your family and celebrate")  
-        else:
-            print("You missed! Bayesian Inference is a lie! Screw you Bayes!")
-            
-    print(str(shotsFiredByEnemy)+" shots were fired by the opponent")
+            print("What a conundrum. Since Red ran out of ammo, Blue had to take the shot with the data he had, and missed."
+                  +" After some discussion, it has been agreed that life and death shall now be decided by a game of rock-paper-scissors")
+            print("")
+            playRPS("Blue" , "Red")
+        
+        
+    print('')    
+    print(str(shotsFiredByred)+" shots were fired by Red")
     print(str(numMCMCs)+" MCMCs were executed")
     print("THE END")
 
@@ -495,3 +511,26 @@ def make_error_boxes(xdata, ydata, xerror, yerror, facecolor='black', alpha=1.):
     pc = PatchCollection(errorboxes, facecolor=facecolor, alpha=alpha , zorder=15.)
 
     return pc
+
+
+# dumb rock-papers-scissors game
+def playRPS(name1 , name2):
+    options = ['ROCK' , 'PAPER' , 'SCISSORS']
+    while (True):
+        
+        i = np.random.randint(1,4 , 2) # 1=rock , 2=paper , 3=scissors
+        print(name1 + " chooses " + options[i[0]-1] + ". " + name2 + " chooses " + options[i[1]-1])
+        
+        if   i[0]-i[1]==0 :
+            print("Draw")
+            continue
+        elif i[0]-i[1]==-1 or i[0]-i[1]==2:
+            print("FATALITY. " + name1 + " DIED. " + name2 + " WINS")
+            return
+        elif i[0]-i[1]==1 or i[0]-i[1]==-2:
+            print("FATALITY. " + name2 + " DIED. " + name1 + " WINS")
+            return
+            
+            
+            
+            
