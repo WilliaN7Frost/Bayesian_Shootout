@@ -405,8 +405,7 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
             shotWasHit.append(False)
             
         if (hit_tolerance < len(shotsReceived)):
-            print("Blue DIED. Shots to the body were felt at x,y,z = " + str(shotsReceived))
-            print(str(shotsFiredByred)+" shots were fired by Red")
+            print("Blue DIED. Red landed " + str(len(shotsReceived)) + " out of " + str(shotsFiredByred) + " of his shots")
             if doPlot: plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , 
                                     shotWasHit , blue_hitbox , red_hitbox , ylevel=0)
             return
@@ -448,7 +447,6 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
                     print("SUCCESSFUL HIT. Bayesian Inference triumphs at the Battle of Two Buildings! Blue can now go home to his family and celebrate")
                     break
                 else:
-                    bestShot[1] = bestShot[1] - buildingDims[1]
                     print("Blue missed! Bayesian Inference is a lie! Screw you Bayes!")
                     print('')
     
@@ -476,7 +474,7 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
     
     if(shotsFiredByred >= shotsAllowed):
         # take best shot anyways, see what gives
-        if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc)):
+        if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc) and blueShotNotTaken==True):
             print("Blue got lucky and lived. With those confidence intervals, that was almost like shooting blind. But his desperate shot worked")
         else:
             print("What a conundrum. Since Red ran out of ammo, Blue had to take the shot with the data he had, and missed."
