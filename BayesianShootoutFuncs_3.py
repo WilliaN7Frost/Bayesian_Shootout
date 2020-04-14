@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  6 20:07:16 2020
+Created on Tue Apr 14 18:50:56 2020
 
 @author: wilia
 """
@@ -406,8 +406,8 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
             
         if (hit_tolerance < len(shotsReceived)):
             print("Blue DIED. Red landed " + str(len(shotsReceived)) + " out of " + str(shotsFiredByRed) + " of his shots")
-            if doPlot: plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , 
-                                    shotWasHit , blue_hitbox , red_hitbox , ylevel=0)
+            #if doPlot: plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , 
+            #                        shotWasHit , blue_hitbox , red_hitbox , ylevel=0)
             blueDied = True
             break
         
@@ -443,6 +443,8 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
             if ( confidenceRegionX <= red_hitbox[0] and confidenceRegionZ <= red_hitbox[2] and blueShotNotTaken==True):
                 blueShotNotTaken = False
                 # take best shot, hit the other (hopefully)
+                # Since the MCMC searches for a coordinate within the opponents building, adjust the inferred coordinate
+                # to accurately represent it on the map
                 bestShot[1] = bestShot[1] + buildingDims[1]
                 if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc)):
                     print("SUCCESSFUL HIT. Bayesian Inference triumphs in battle! Blue can now go home to his family and celebrate")
@@ -450,10 +452,24 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
                 else:
                     print("Blue missed! Bayesian Inference is a lie! Screw you Bayes!")
                     print('')
+                    
+            elif ( shotsAllowed == shotsFiredByRed and blueShotNotTaken==True):
+                blueShotNotTaken = False
+                # take best shot even though your confidence is not optimal, hit the other (hopefully)
+                bestShot[1] = bestShot[1] + buildingDims[1]
+                if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc)):
+                    print("Blue got lucky and lived. With those confidence intervals, that was almost like shooting blind. But his desperate shot worked")
+                    break
+                else:
+                    print("What a conundrum. Since Red ran out of ammo, Blue had to take the shot with the data he had, and missed."
+                          +" After some discussion, it has been agreed that life and death shall now be decided by a game of rock-paper-scissors")
+                    print("")
+                    playRPS("Blue" , "Red")
+                    break
     
     
     
-    if doCornerPlot and not blueDied:
+    if doCornerPlot and shotsFiredByRed >= start_MCing_at:
         # adding the distance between buildings and the buildings y-length to the beta parameter list
         for i in range(len(param_collection)):
             param_collection[i][1] += buildingDims[1]#+bSeper/2
@@ -461,29 +477,40 @@ def beginGame(blue_loc=[] , red_loc=[] , blue_hitbox=[] , red_hitbox = [] , buil
               quantiles = [0.16,0.5,0.84] , show_titles=True )
     
     
-    # Since the MCMC searches for a coordinate within the opponents building, adjust the inferred coordinate
-    # to accurately represent it on the map
-    bestShot[1] = bestShot[1] + buildingDims[1]# + bSeper/2
+    
+    if shotsAllowed < start_MCing_at or ( blueDied and blueShotNotTaken) :
+        bestShot[1] = bestShot[1] + buildingDims[1]
+    
     # Using the angles of blue shot, get a coordinate point such as to plot blue shot on the map
     visualizeBestShot = shotAtLocationY( -np.arctan( (bestShot[0]-blue_loc[0])/(bestShot[1]-blue_loc[1]) ) ,
                                -np.arctan( (bestShot[2]-blue_loc[2])/(bestShot[1]-blue_loc[1]) ) , blue_loc , yloc=2.1*buildingDims[1]+bSeper)
-    
-    
-    if doPlot and not blueDied: plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , shotWasHit , 
+    if doPlot:
+        if (  blueShotNotTaken and shotsAllowed >= start_MCing_at  ):
+            plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , shotWasHit , 
+                                  blue_hitbox , red_hitbox , ylevel=0 , emceeOutput=bestShot)
+        else:
+            plotShots2D( blue_loc , red_loc , buildingDims , bSeper , shotsForVisualize , shotWasHit , 
                                   blue_hitbox , red_hitbox , ylevel=0 , blueShot=visualizeBestShot , emceeOutput=bestShot)
     
     
-    if(shotsFiredByRed >= shotsAllowed):
+    if shotsAllowed < start_MCing_at :
         # take best shot anyways, see what gives
         if (wasShotAHit(red_loc , bestShot , red_hitbox , shotFrom=blue_loc) and blueShotNotTaken==True):
-            print("Blue got lucky and lived. With those confidence intervals, that was almost like shooting blind. But his desperate shot worked")
+            print("Even without his MCMC, Blue got lucky and lived. With those confidence intervals, that was almost like shooting blind. But his desperate shot worked")
         else:
             print("What a conundrum. Since Red ran out of ammo, Blue had to take the shot with the data he had, and missed."
                   +" After some discussion, it has been agreed that life and death shall now be decided by a game of rock-paper-scissors")
             print("")
             playRPS("Blue" , "Red")
+    
+    
+    if not blueDied and shotsAllowed <= shotsFiredByRed and not blueShotNotTaken:
+        print("What a conundrum. Both of you ran out of ammo."
+              +" After some discussion, it has been agreed that life and death shall now be decided by a game of rock-paper-scissors")
+        print("")
+        playRPS("Blue" , "Red")
         
-        
+    
     print('')    
     print(str(shotsFiredByRed)+" shots were fired by Red")
     print(str(numMCMCs)+" MCMCs were executed")
