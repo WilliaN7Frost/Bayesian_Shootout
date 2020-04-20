@@ -1,0 +1,57 @@
+Final Project Marks
+----------------------------------------
+----------------------------------------
+Clear description of your problem: 5/5
+Approach to your problem: 10/10
+Technical execution: 25/25
+Documentation and testing: 5/5
+Presentation of results: 5/5
+Interpretation of results: 10/10
+Overall communication: 5/5
+
+SUBTOTAL: 65/65
+
+Creativity + critical thinking bonus: 10/10
+
+TOTAL: 75/65
+
+----------------------------------------
+General comments
+----------------------------------------
+
+WOW! This was such a wonderful final project.
+I basically have no complaints about it. The
+problem you picked was a good (and fun!) one.
+The code is nicely written, and you presented
+your results in a visually effective way in your
+final paper.
+
+One really interesting thing that can be done
+(if you're bored at some point!) is to tack
+on an optimization problem. In other words,
+you've solved the backwards problem for Blue,
+trying to infer the location of Red. But now
+that there's this information available to
+Blue, what's the best strategy? You answer
+this is a semi-qualitative way in the discussion
+in Section 3, but you can take this to the next
+level by wrapping this in the context of
+decision theory. All you'd have to do is to
+wrap your game in a big loop where you run
+lots of Monte Carlo simulations where Red and
+Blue try out lots of different strategies.
+(Blue should feel completely comfortable
+doing this: when appropriate, forward simulations
+are perfectly acceptable even to truly
+committed Bayesians!) This lets you try out
+a bunch of complicated things, e.g., different
+strategies for Red depending on whether he
+knows Blue is trained in the Art of Bayes.
+
+It was really a pleasure having you in the
+class this term. Best of luck, and I hope
+you have a relaxing and enjoyable summer!
+
+Best,
+Adrian
+
